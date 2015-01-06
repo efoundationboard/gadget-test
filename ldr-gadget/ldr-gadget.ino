@@ -1,3 +1,13 @@
+/*
+
+Hardware:
+Mcu:	nano 328
+BOM List see tower.im
+ldr pin: A0
+Led pin: D9
+
+*/
+
 void setup()
 {
 	pinMode(9, OUTPUT);
