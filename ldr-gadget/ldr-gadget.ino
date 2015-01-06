@@ -6,6 +6,13 @@ BOM List see tower.im
 ldr pin: A0
 Led pin: D9
 
+
+wire reg
+RED 	5V
+BROWN	Gound
+YELLOW	LDR Sensor
+ORANGE	LED Control
+
 */
 
 void setup()
@@ -16,15 +23,22 @@ void setup()
 
 void loop()
 {
-	/*
+	ledTest();
+
+}
+
+void ledTest()
+{
 	digitalWrite(9, HIGH);
 	delay(500);
 	digitalWrite(9, LOW);
 	delay(500);
-	*/
+}
+
+void ldrTest()
+{
 	digitalWrite(9, HIGH);
 	int l = analogRead(A0);
 	Serial.println(l);
 	delay(100);
-
 }
