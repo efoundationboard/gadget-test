@@ -23,8 +23,50 @@ void setup()
 
 void loop()
 {
-	ledTest();
+	readSerial();
+}
 
+void readSerial()
+{
+	if (Serial.available() > 0)
+	{
+		char cmd = Serial.read();
+
+		switch (cmd)
+		{
+			case ('?'):
+			{
+				Serial.write('L');
+				break;
+			}
+			case ('T'):
+			{
+				Serial.write('R');
+				break;
+			}
+			case ('N'):
+			{
+				digitalWrite(9, HIGH);
+				break;
+			}
+			case ('F'):
+			{
+				digitalWrite(9, LOW);
+				break;
+			}
+			case ('L'):
+			{
+				int a = analogRead(A0);
+				a /= 4;
+				Serial.write(a);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+	}
 }
 
 void ledTest()
