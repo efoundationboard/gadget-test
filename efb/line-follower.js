@@ -4,16 +4,13 @@ var SerialPort = serialport.SerialPort;
 var efb = {
 	getAllSerialPortName: function(callback){
 		serialport.list(function(err, ports){
-			var serialPortNameList = [];
-			ports.forEach(function(port){
-				serialPortNameList[serialPortNameList.length] = port.comName;
+			if(err) callback(err);
+			var serialPortNameList = ports.map(function(port){
+				return port.comName;
 			});
-
-			callback(err, serialPortNameList);
+			callback(null, serialPortNameList);
 		});
-	}, 
-
-	
+	}
 };
 
 
