@@ -69,6 +69,7 @@ s0.open(function(err){
 	}
 });
 
+<<<<<<< HEAD
 
 
 
@@ -85,3 +86,6 @@ s0.open(function(err){
 				});
 			});
 */
+=======
+*/
+>>>>>>> 22ca51c56c0b00dc729b2c0ccb48c38d72fe4fa6
