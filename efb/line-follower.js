@@ -38,39 +38,52 @@ var efb = {
 	}, 
 
 	setupSerialPort: function(serialportList, callback){
-		var tmpSpList = [];
+		var portBeanList = [];
 
 		serialportList.forEach(function(sp){
-			sp.on("data", function(data){
-				console.log(sp.path + " : receive data: " + data.toString());
+			var portBean = {
+				serialport: sp, 
+				isGadget: false,
+				portName: sp.path, 
 
-			});
-			
-			console.log("serial port data parser setted");
 
-			sp.on("open", function(err){
-				if (err) {
-					console.log(sp.path  + " " + err.toString());
-				} else {
-					console.log(sp.path + " opened, ready to write something to this port");
-					
-					setTimeout(function(){
-						sp.write("?", function(err, results){
-							if (err) {
-								console.log(sp.path + " error: " + err);
-							} else {
-								console.log(sp.path + " results: " + results);
-							}
-						});
-					}, 2000);	//wait for arduino autoreset
-					
+				onData: function(data){
+					console.log(this.portName + " got data: " + data.toString());
+				},
 
-				}
+				writeRequestPacket: function(){
+					this.serialport.write("?", function(err, bytesSent){
+						if (err) {
+							console.log(this.portName + " send failure");
+						} else {
+							console.log(this.portName + " bytes sent");
+						}
+					});
+				}, 
 
-			});
+				onOpen: function(err){
+					if (err) {
+						console.log(this.portName + " open failed");
+					} else {
+						console.log(this.portName + " opened");
+						setTimeout(this.writeRequestPacket, 2000);
+					}
+				}, 
 
-			sp.open(function(err){});
+				openPort: function(){
+					console.log(this.portName + " ready to open");
+					this.serialport.on("data", this.onData);
+					this.serialport.on("open", this.onOpen);
+					this.serialport.open(function(err) {
+
+					});
+				}, 
+			};
+
+			portBeanList[portBeanList.length] = portBean;
+			portBean.openPort();
 		});
+
 
 
 	}, 
