@@ -1,6 +1,19 @@
+/*jslint node: true */
+"use strict";
+
+
 var serialportLib = require("serialport");
 var SerialPort = serialportLib.SerialPort;
 
+var efbParser = function (emitter, buffer) {
+	//console.log(emitter);
+	emitter.emit("data", buffer);
+}
+
+var DEFAULT_EFB_DATA_CALLBACK = function(data) {
+	console.log("here is default data callback");
+	console.log(data);
+}
 
 
 var DEFAULT_SERIAL_OPTION = {
@@ -9,6 +22,8 @@ var DEFAULT_SERIAL_OPTION = {
 	parity: "none", 
 	stopbits: 1,
 	flowcontrol : false,
+	parser: efbParser,
+	//dataCallback: DEFAULT_EFB_DATA_CALLBACK, 
 };
 
 var efb = {
@@ -29,9 +44,9 @@ var efb = {
 	}, 
 
 	openSerialPort: function(serialPortNameList, callback){
-		serialportList = [];
+		var serialportList = [];
 		serialPortNameList.forEach(function(portName){
-			serialport = new SerialPort(portName, DEFAULT_SERIAL_OPTION, false);
+			var serialport = new SerialPort(portName, DEFAULT_SERIAL_OPTION, false);
 			serialportList[serialportList.length] = serialport;
 		});
 		callback(null, serialportList);
