@@ -48,25 +48,29 @@ var efb = {
 
 
 				onData: function(data){
-					console.log(this.portName + " got data: " + data.toString());
+					var self = portBean;
+					//console.log(this);
+					console.log(self.portName + " got data: " + data.toString());
 				},
 
 				writeRequestPacket: function(){
-					this.serialport.write("?", function(err, bytesSent){
+					var self = portBean;
+					self.serialport.write("?", function(err, bytesSent){
 						if (err) {
-							console.log(this.portName + " send failure");
+							console.log(self.portName + " send failure");
 						} else {
-							console.log(this.portName + " bytes sent");
+							console.log(self.portName + " " + bytesSent + " bytes sent");
 						}
 					});
 				}, 
 
 				onOpen: function(err){
+					var self = portBean;
 					if (err) {
-						console.log(this.portName + " open failed");
+						console.log(this.path + " open failed");
 					} else {
-						console.log(this.portName + " opened");
-						setTimeout(this.writeRequestPacket, 2000);
+						console.log(this.path + " opened");
+						setTimeout(self.writeRequestPacket, 2000);
 					}
 				}, 
 
