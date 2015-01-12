@@ -26,6 +26,67 @@ var DEFAULT_SERIAL_OPTION = {
 	//dataCallback: DEFAULT_EFB_DATA_CALLBACK, 
 };
 
+var SerialPortBean = function(portName, options) {
+	var self = this;
+	this.portName = portName;
+	this.options = options;
+	this.serialport = undefined;
+	this.isGadget = false;
+
+	this.makeDataCallback = function() {
+		console.log("self is " + self.portName);
+		return function(data) {
+			console.log(self.portName + " got data: " + data.toString());
+		};
+	};
+
+	this.dataCallback = function(data) {
+		//console.log(self);
+		console.log(self);
+		console.log(self.portName + " got data: " + data.toString());
+	};
+
+	options.dataCallback = this.makeDataCallback();
+
+	this.sendRequestPacket = function(){
+		self.serialport.write("?", function(err, bytesSent){
+			if (err) {
+				console.log(self.portName + " send failure");
+			} else {
+				console.log(self.portName + " " + bytesSent + " bytes sent");
+			}
+		});
+	}, 
+
+
+	this.onOpen = function(err) {
+		if (err)
+		{
+			console.log(self.portName + " open failure");
+		} else {
+			console.log(self.portName + " opened");
+
+			setTimeout(self.sendRequestPacket, 2000);
+		}
+
+		
+	};
+
+	this.connect = function(){
+		var sp = new SerialPort(this.portName, this.options, false);
+		this.serialport = sp;
+
+		sp.on("open", this.onOpen);
+
+		sp.open(function(err) {
+
+		});
+	};
+
+};
+
+
+
 var efb = {
 	getAllSerialPortName: function(callback){
 		serialportLib.list(function(err, ports){
@@ -43,68 +104,11 @@ var efb = {
 		});
 	}, 
 
-	openSerialPort: function(serialPortNameList, callback){
-		var serialportList = [];
-		serialPortNameList.forEach(function(portName){
-			var serialport = new SerialPort(portName, DEFAULT_SERIAL_OPTION, false);
-			serialportList[serialportList.length] = serialport;
+	openSerialPort: function(serialPortNameList){
+		serialPortNameList.forEach(function(portName) {
+			var spb = new SerialPortBean(portName, DEFAULT_SERIAL_OPTION);
+			spb.connect();
 		});
-		callback(null, serialportList);
-	}, 
-
-	setupSerialPort: function(serialportList, callback){
-		var portBeanList = [];
-
-		serialportList.forEach(function(sp){
-			var portBean = {
-				serialport: sp, 
-				isGadget: false,
-				portName: sp.path, 
-
-
-				onData: function(data){
-					var self = portBean;
-					//console.log(this);
-					console.log(self.portName + " got data: " + data.toString());
-				},
-
-				writeRequestPacket: function(){
-					var self = portBean;
-					self.serialport.write("?", function(err, bytesSent){
-						if (err) {
-							console.log(self.portName + " send failure");
-						} else {
-							console.log(self.portName + " " + bytesSent + " bytes sent");
-						}
-					});
-				}, 
-
-				onOpen: function(err){
-					var self = portBean;
-					if (err) {
-						console.log(this.path + " open failed");
-					} else {
-						console.log(this.path + " opened");
-						setTimeout(self.writeRequestPacket, 2000);
-					}
-				}, 
-
-				openPort: function(){
-					console.log(this.portName + " ready to open");
-					this.serialport.on("data", this.onData);
-					this.serialport.on("open", this.onOpen);
-					this.serialport.open(function(err) {
-
-					});
-				}, 
-			};
-
-			portBeanList[portBeanList.length] = portBean;
-			portBean.openPort();
-		});
-
-
-
 	}, 
 };
 
@@ -112,9 +116,7 @@ var efb = {
 efb.getAllSerialPortName(function(err, namelist){
 	console.log(namelist.length + " serial port(s) found.");
 
-	efb.openSerialPort(namelist, function(err, serialportList){
-		//console.log(serialportList);
-		efb.setupSerialPort(serialportList, null);
+	efb.openSerialPort(namelist, function(err){
 	});
 });
 
