@@ -59,6 +59,7 @@ efb.getAllSerialPortName(function(err, namelist){
 });
 
 
+
 /*
 var s0 = new SerialPort("/dev/ttyUSB0", {baudrate: 9600}, true);
 s0.open(function(err){
