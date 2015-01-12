@@ -26,22 +26,31 @@ var DEFAULT_SERIAL_OPTION = {
 	//dataCallback: DEFAULT_EFB_DATA_CALLBACK, 
 };
 
+var cnt = 100;
+
 var SerialPortBean = function(portName, options) {
 	var self = this;
 	this.portName = portName;
 	this.options = options;
 	this.serialport = undefined;
 	this.isGadget = false;
+	this.id = cnt;
+
+	cnt ++;
 
 	this.makeDataCallback = function() {
+		console.log("my id is " + self.id);
 		console.log("self is " + self.portName);
 		return function(data) {
+			console.log("my id is " + self.id);
+			// here this is the right serialport.options
+			// but self always same
+			console.log(self.id);
 			console.log(self.portName + " got data: " + data.toString());
 		};
 	};
 
 	this.dataCallback = function(data) {
-		//console.log(self);
 		console.log(self);
 		console.log(self.portName + " got data: " + data.toString());
 	};
@@ -49,6 +58,7 @@ var SerialPortBean = function(portName, options) {
 	options.dataCallback = this.makeDataCallback();
 
 	this.sendRequestPacket = function(){
+		console.log("my id is " + self.id);
 		self.serialport.write("?", function(err, bytesSent){
 			if (err) {
 				console.log(self.portName + " send failure");
@@ -60,6 +70,7 @@ var SerialPortBean = function(portName, options) {
 
 
 	this.onOpen = function(err) {
+		console.log("my id is " + self.id);
 		if (err)
 		{
 			console.log(self.portName + " open failure");
@@ -73,6 +84,7 @@ var SerialPortBean = function(portName, options) {
 	};
 
 	this.connect = function(){
+		console.log("my id is " + self.id);
 		var sp = new SerialPort(this.portName, this.options, false);
 		this.serialport = sp;
 
@@ -83,6 +95,7 @@ var SerialPortBean = function(portName, options) {
 		});
 	};
 
+	console.log("my id is " + this.id);
 };
 
 
