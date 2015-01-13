@@ -100,7 +100,7 @@ var SerialPortBean = function(portName, options) {
 			if (err) {
 				console.log(self.portName + " send failure");
 			} else {
-				console.log(self.portName + " " + bytesSent + " bytes sent");
+				//console.log(self.portName + " " + bytesSent + " bytes sent");
 			}
 		});
 	}, 
@@ -111,7 +111,7 @@ var SerialPortBean = function(portName, options) {
 		{
 			console.log(self.portName + " open failure");
 		} else {
-			console.log(self.portName + " opened");
+			//console.log(self.portName + " opened");
 
 			setTimeout(self.sendRequestPacket, 2000);
 		}
@@ -135,7 +135,7 @@ var SerialPortBean = function(portName, options) {
 			if (err) {
 				console.log("failed to close serialport");
 			} else {
-				console.log(self.portName + " closed");
+				//console.log(self.portName + " closed");
 			}
 		});
 	};
@@ -145,6 +145,8 @@ var SerialPortBean = function(portName, options) {
 
 var efb = {
 	serialPortList: [],
+	gadgetList: [],
+	gadgetCallback: null, 
 	getAllSerialPortName: function(callback){
 		serialportLib.list(function(err, ports){
 			if (err)
@@ -162,20 +164,26 @@ var efb = {
 	}, 
 
 	checkGadget: function() {
-		console.log("ready to check gadget");
+		//console.log("ready to check gadget");
 		efb.serialPortList.forEach(function(spb){
 			if (spb.isGadget === false) {
 				spb.close();
+			} else {
+				efb.gadgetList[efb.gadgetList.length] = spb;
+
 			}
+
 		});
+
+		efb.gadgetCallback(efb.gadgetList);
 	}, 
 
-	openSerialPort: function(serialPortNameList){
-		
+	openSerialPort: function(serialPortNameList, callback){
+		efb.gadgetCallback = callback;
 		serialPortNameList.forEach(function(portName) {
 			var spb = new SerialPortBean(portName, DEFAULT_SERIAL_OPTION);
 			spb.connect();
-			efb.serialPortList[efb.serialPortList.length] = spb;
+ 			efb.serialPortList[efb.serialPortList.length] = spb;
 		});
 
 		setTimeout(efb.checkGadget, 3000);
@@ -184,11 +192,13 @@ var efb = {
 
 };
 
+var gadgetCallback = function(gadgetList) {
+	console.log(gadgetList.length + " gadget(s) found");
+}
 
 efb.getAllSerialPortName(function(err, namelist){
 	console.log(namelist.length + " serial port(s) found.");
 
-	efb.openSerialPort(namelist, function(err){
-	});
+	efb.openSerialPort(namelist, gadgetCallback);
 });
 
