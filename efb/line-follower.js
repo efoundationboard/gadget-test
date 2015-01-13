@@ -28,6 +28,7 @@ var gadgetList = [];
 
 var GADGET_EXECUTING_IDLE = 0;
 var GADGET_EXECUTING_REQUEST_TAG = 1;
+var GADGET_EXECUTING_READ_BYTE = 2;
 
 var Gadget = function(sp, gadgetType, callback) {
 
@@ -35,7 +36,7 @@ var Gadget = function(sp, gadgetType, callback) {
 	this._gadgetType = gadgetType;
 	this._tag = undefined;
 	this._executing = GADGET_EXECUTING_IDLE;
-	this._setupDoneCallback = callback;
+	this._callback = callback;
 
 	var self = this;
 
@@ -45,12 +46,15 @@ var Gadget = function(sp, gadgetType, callback) {
 				break;
 			case GADGET_EXECUTING_REQUEST_TAG:
 				self._tag = data.toString();
-				if (self._setupDoneCallback) {
-          self._setupDoneCallback();
-        }
-        gadgetList[self._tag] = self;
-        gadgetList[gadgetList.length] = self;
+				if (self._callback) {
+					self._callback();
+				}
+				gadgetList[self._tag] = self;
+				gadgetList[gadgetList.length] = self;
 				break;
+			case GADGET_EXECUTING_READ_BYTE:
+				var value = data[0];
+				self._callback("ok", value);
 			default:
 				break;
 		}
@@ -78,6 +82,25 @@ var Gadget = function(sp, gadgetType, callback) {
 				} else {
 					callback("gadget has no channel " + channel);
 				}
+				break;
+			default:
+				callback("gadget not support");
+				break;
+		}
+	};
+
+	this._readValue = function(channel, callback) {
+		switch (self._gadgetType) {
+			case GADGET_TYPE_LDR:
+				if (channel === "B")
+				{
+					self._executing = GADGET_EXECUTING_READ_BYTE;
+					self._callback = callback;
+					self._sp.write("L");
+				} else {
+					callback("gadget has no channel " + channel);
+				}
+
 				break;
 			default:
 				callback("gadget not support");
@@ -187,7 +210,32 @@ var server = http.createServer(function(req, resp) {
 				});
 			}
 
+		} else {
+			if (pathname === "/read_value") {
+				var channel = urlObj.query.channel;
+				var gadgetTag = urlObj.query.tag;
 
+				var g = gadgetList[gadgetTag];
+				var respObj = {
+					tag: urlObj.query.tag, 
+					channel: urlObj.query.channel, 
+					message: undefined, 
+					value: undefined, 
+				};
+				if (g == undefined) {
+					respObj.message = "cannot find this gadget";
+
+					resp.write(JSON.stringify(respObj));
+					resp.end();
+				} else {
+					g._readValue(channel, function(message, value){
+						respObj.message = message;
+						respObj.value = value;
+						resp.write(JSON.stringify(respObj));
+						resp.end();
+					});
+				}
+			}
 		}
 	}
 });
