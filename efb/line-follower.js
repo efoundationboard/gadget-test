@@ -25,17 +25,51 @@ var DEFAULT_SERIAL_OPTION = {
 serialport.list(function(err, ports){
   ports.forEach(function(port){
     var sp = new SerialPort(port.comName, {baudrate:9600}, false);
-
+    var candidate = {
+    	spObj: sp,
+    	isGadget: false,
+    	gadgetType: GADGET_TYPE_NOT_GADGET, 
+    };
     sp.on("open", function(){
       console.log(sp.path + " opened");
-      sp.on("data", function(data){
-        console.log(sp.path + " received " + data);
-      });
+      
       var writeRequest = function(){
         sp.write("?");
-      }
-      //setInterval(function(){sp.write("?");}, 1000);
+      };
+      var checkResponsePacket = function(data) {
+      	var dataStr = data.toString();
+      	if (dataStr.length === 1) {
+      		if (dataStr === "L") {
+      			candidate.isGadget = true;
+      			candidate.gadgetType = GADGET_TYPE_LDR;
+      		} else {
+      			if (dataStr === "M") {
+      				candidate.isGadget = true;
+      				candidate.gadgetType = GADGET_TYPE_DUAL_MOTOR;
+      			}
+      		}
+      	}
+      };
+
+      sp.on("data", function(data){
+        checkResponsePacket(data);
+      });
+
       setTimeout(writeRequest, 2000);
+
+      var checkGadget = function()
+      {
+      	if (candidate.isGadget) {
+      		console.log(candidate.spObj.path + " is gadget : " + GADGET_TYPE_STR[candidate.gadgetType]);
+      	}
+      	else
+      	{
+      		candidate.spObj.close();
+      	}
+      };
+
+      setTimeout(checkGadget, 3000);
+
     });
     sp.open();
   })
