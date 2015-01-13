@@ -44,7 +44,6 @@ var distinguishGadgetType = function(rawData) {
 			} else {
 				return GADGET_TYPE_NOT_GADGET;
 			}
-
 		}
 
 	} else {
@@ -84,7 +83,12 @@ var SerialPortBean = function(portName, options) {
 		//console.log(self);
 		//console.log(self.portName + " got data: " + data.toString());
 		self.gadgetType = distinguishGadgetType(data);
-		console.log(self.portName + " is " + GADGET_TYPE_STR[self.gadgetType]);
+		if (self.gadgetType === GADGET_TYPE_NOT_GADGET) {
+			self.isGadget = false;
+		} else {
+			self.isGadget = true;
+		}
+		//console.log(self.portName + " is " + GADGET_TYPE_STR[self.gadgetType]);
 
 	};
 
@@ -125,6 +129,16 @@ var SerialPortBean = function(portName, options) {
 
 		});
 	};
+
+	this.close = function() {
+		self.serialport.close(function(err){
+			if (err) {
+				console.log("failed to close serialport");
+			} else {
+				console.log(self.portName + " closed");
+			}
+		});
+	};
 };
 
 
@@ -150,7 +164,9 @@ var efb = {
 	checkGadget: function() {
 		console.log("ready to check gadget");
 		efb.serialPortList.forEach(function(spb){
-			console.log(spb.gadgetType);
+			if (spb.isGadget === false) {
+				spb.close();
+			}
 		});
 	}, 
 
