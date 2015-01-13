@@ -5,6 +5,7 @@
   "author": "HE Qichen",
   "dependencies": {
     "q" : "~1.0.1",
-    "serialport": "1.4.x"
+    "serialport": "1.4.x",
+    "async": "~0.9.0"
   }
 }
