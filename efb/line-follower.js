@@ -48,6 +48,8 @@ var Gadget = function(sp, gadgetType, callback) {
 				if (self._setupDoneCallback) {
           self._setupDoneCallback();
         }
+        gadgetList[self._tag] = self;
+        gadgetList[gadgetList.length] = self;
 				break;
 			default:
 				break;
@@ -65,10 +67,6 @@ var Gadget = function(sp, gadgetType, callback) {
 	self._requestTag();
 
 };
-
-var addGadget = function(g) {
-	gadgetList[gadgetList.length] = g;
-}
 
 serialport.list(function(err, ports){
 	ports.forEach(function(port){
@@ -110,8 +108,6 @@ serialport.list(function(err, ports){
 				if (candidate.isGadget) {
 					console.log(candidate.spObj.path + " is gadget : " + GADGET_TYPE_STR[candidate.gadgetType]);
 					var g = new Gadget(candidate.spObj, candidate.gadgetType);
-          addGadget(g);
-					
 				}
 				else
 				{
