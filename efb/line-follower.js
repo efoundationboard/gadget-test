@@ -66,6 +66,25 @@ var Gadget = function(sp, gadgetType, callback) {
 	
 	self._requestTag();
 
+	this._writeBinary = function(channel, value, callback) {
+		switch (self._gadgetType) {
+			case GADGET_TYPE_LDR:
+				if (channel === "A") {
+					if (Number(value) === 0) {
+						self._sp.write("F", function(err, result) {callback("ok");});
+					} else {
+						self._sp.write("N", function(err, result) {callback("ok");});
+					}
+				} else {
+					callback("gadget has no channel " + channel);
+				}
+				break;
+			default:
+				callback("gadget not support");
+				break;
+		}
+	}
+
 };
 
 serialport.list(function(err, ports){
@@ -128,8 +147,7 @@ var server = http.createServer(function(req, resp) {
 	var pathname = urlObj.pathname;
 
 	resp.writeHead(200, { 'Content-Type': 'application/json' });
-	if (pathname === "/list_all_gadgets")
-	{
+	if (pathname === "/list_all_gadgets") {
 		var respList = [];
 		gadgetList.forEach(function(gadget) {
 			var respObj = {
@@ -143,6 +161,34 @@ var server = http.createServer(function(req, resp) {
 		resp.write(JSON.stringify(respList));
 		resp.end();
 
+	} else {
+		if (pathname === "/write_binary") {
+			var channel = urlObj.query.channel;
+			var value = urlObj.query.value;
+			var gadgetTag = urlObj.query.tag;
+
+			var g = gadgetList[gadgetTag];
+			var respObj = {
+				tag: urlObj.query.tag, 
+				value	: urlObj.query.value, 
+				channel: urlObj.query.channel, 
+				message: undefined, 
+			};
+			if (g == undefined) {
+				respObj.message = "cannot find this gadget";
+
+				resp.write(JSON.stringify(respObj));
+				resp.end();
+			} else {
+				g._writeBinary(channel, value, function(message){
+					respObj.message = message;
+					resp.write(JSON.stringify(respObj));
+					resp.end();
+				});
+			}
+
+
+		}
 	}
 });
 
