@@ -241,3 +241,11 @@ var server = http.createServer(function(req, resp) {
 });
 
 server.listen(8080);
+
+
+/*-------------------
+test urls
+http://127.0.0.1:8080/list_all_gadgets
+http://127.0.0.1:8080/write_binary?tag=L&channel=A&value=1
+http://127.0.0.1:8080/read_value?tag=L&channel=B
+---------------------*/
