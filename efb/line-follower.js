@@ -26,9 +26,44 @@ var DEFAULT_SERIAL_OPTION = {
 
 var gadgetList = [];
 
-var Gadget = function(sp, gadgetType) {
+var GADGET_EXECUTING_IDLE = 0;
+var GADGET_EXECUTING_REQUEST_TAG = 1;
+
+var Gadget = function(sp, gadgetType, callback) {
+
 	this._sp = sp;
 	this._gadgetType = gadgetType;
+	this._tag = undefined;
+	this._executing = GADGET_EXECUTING_IDLE;
+	this._setupDoneCallback = callback;
+
+	var self = this;
+
+	this.parseData = function(data) {
+		switch (self._executing) {
+			case GADGET_EXECUTING_IDLE:
+				break;
+			case GADGET_EXECUTING_REQUEST_TAG:
+				self._tag = data.toString();
+				if (self._setupDoneCallback) {
+          self._setupDoneCallback();
+        }
+				break;
+			default:
+				break;
+		}
+		self._executing = GADGET_EXECUTING_IDLE;
+	};
+
+	self._sp.on("data", self.parseData);
+
+	this._requestTag = function() {
+		self._executing = GADGET_EXECUTING_REQUEST_TAG;
+		self._sp.write("T");
+	}
+	
+	self._requestTag();
+
 };
 
 var addGadget = function(g) {
@@ -75,7 +110,8 @@ serialport.list(function(err, ports){
 				if (candidate.isGadget) {
 					console.log(candidate.spObj.path + " is gadget : " + GADGET_TYPE_STR[candidate.gadgetType]);
 					var g = new Gadget(candidate.spObj, candidate.gadgetType);
-					addGadget(g);
+          addGadget(g);
+					
 				}
 				else
 				{
@@ -102,13 +138,14 @@ var server = http.createServer(function(req, resp) {
 		gadgetList.forEach(function(gadget) {
 			var respObj = {
 				dev: gadget._sp.path, 
-        gadgetType: gadget._gadgetType, 
-        gadgetTypeStr: GADGET_TYPE_STR[gadget._gadgetType], 
+				gadgetType: gadget._gadgetType, 
+				gadgetTypeStr: GADGET_TYPE_STR[gadget._gadgetType], 
+				tag: gadget._tag, 
 			};
-      respList[respList.length] = respObj;
+			respList[respList.length] = respObj;
 		});
-    resp.write(JSON.stringify(respList));
-    resp.end();
+		resp.write(JSON.stringify(respList));
+		resp.end();
 
 	}
 });
