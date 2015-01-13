@@ -49,13 +49,17 @@ var SerialPortBean = function(portName, options) {
 			console.log(self.portName + " got data: " + data.toString());
 		};
 	};
+	this.acb = function(pp, data) {
+		console.log(self.portName + " | " + pp + " got data: " + data.toString());
+	};
 
 	this.dataCallback = function(data) {
-		console.log(self);
+		//console.log(self);
 		console.log(self.portName + " got data: " + data.toString());
 	};
 
 	options.dataCallback = this.makeDataCallback();
+	options.acb = this.dataCallback;
 
 	this.sendRequestPacket = function(){
 		console.log("my id is " + self.id);
