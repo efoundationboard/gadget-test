@@ -1,6 +1,14 @@
 /*jslint node: true */
 "use strict";
 
+var GADGET_TYPE_NOT_GADGET = 0;
+var GADGET_TYPE_LDR = 1;
+var GADGET_TYPE_DUAL_MOTOR = 2;
+
+var GADGET_TYPE_STR = [];
+GADGET_TYPE_STR[GADGET_TYPE_NOT_GADGET] = "not a gadget";
+GADGET_TYPE_STR[GADGET_TYPE_LDR] = "LDR gadget";
+GADGET_TYPE_STR[GADGET_TYPE_DUAL_MOTOR] = "dual motor gadget";
 
 var serialportLib = require("serialport");
 var SerialPort = serialportLib.SerialPort;
@@ -15,7 +23,6 @@ var DEFAULT_EFB_DATA_CALLBACK = function(data) {
 	console.log(data);
 }
 
-
 var DEFAULT_SERIAL_OPTION = {
 	baudrate: 9600,
 	databits: 8,
@@ -26,6 +33,26 @@ var DEFAULT_SERIAL_OPTION = {
 	//dataCallback: DEFAULT_EFB_DATA_CALLBACK, 
 };
 
+var distinguishGadgetType = function(rawData) {
+	var packetString = rawData.toString();
+	if (packetString.length === 1) {
+		if (packetString === "L") {
+			return GADGET_TYPE_LDR;
+		} else {
+			if (packetString === "M") {
+				return GADGET_TYPE_DUAL_MOTOR;
+			} else {
+				return GADGET_TYPE_NOT_GADGET;
+			}
+
+		}
+
+	} else {
+		return GADGET_TYPE_NOT_GADGET;
+	}
+};
+
+
 var cnt = 100;
 
 var SerialPortBean = function(portName, options) {
@@ -35,7 +62,7 @@ var SerialPortBean = function(portName, options) {
 	this.serialport = undefined;
 	this.isGadget = false;
 	this.id = cnt;
-
+	this.gadgetType = GADGET_TYPE_NOT_GADGET;
 	cnt ++;
 
 	this.makeDataCallback = function() {
@@ -55,14 +82,16 @@ var SerialPortBean = function(portName, options) {
 
 	this.dataCallback = function(data) {
 		//console.log(self);
-		console.log(self.portName + " got data: " + data.toString());
+		//console.log(self.portName + " got data: " + data.toString());
+		self.gadgetType = distinguishGadgetType(data);
+		console.log(self.portName + " is " + GADGET_TYPE_STR[self.gadgetType]);
+
 	};
 
-	options.dataCallback = this.makeDataCallback();
+	//options.dataCallback = this.makeDataCallback();
 	options.acb = this.dataCallback;
 
 	this.sendRequestPacket = function(){
-		console.log("my id is " + self.id);
 		self.serialport.write("?", function(err, bytesSent){
 			if (err) {
 				console.log(self.portName + " send failure");
@@ -74,7 +103,6 @@ var SerialPortBean = function(portName, options) {
 
 
 	this.onOpen = function(err) {
-		console.log("my id is " + self.id);
 		if (err)
 		{
 			console.log(self.portName + " open failure");
@@ -88,7 +116,6 @@ var SerialPortBean = function(portName, options) {
 	};
 
 	this.connect = function(){
-		console.log("my id is " + self.id);
 		var sp = new SerialPort(this.portName, this.options, false);
 		this.serialport = sp;
 
@@ -98,8 +125,6 @@ var SerialPortBean = function(portName, options) {
 
 		});
 	};
-
-	console.log("my id is " + this.id);
 };
 
 
