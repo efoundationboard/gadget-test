@@ -130,6 +130,7 @@ var SerialPortBean = function(portName, options) {
 
 
 var efb = {
+	serialPortList: [],
 	getAllSerialPortName: function(callback){
 		serialportLib.list(function(err, ports){
 			if (err)
@@ -146,12 +147,25 @@ var efb = {
 		});
 	}, 
 
+	checkGadget: function() {
+		console.log("ready to check gadget");
+		efb.serialPortList.forEach(function(spb){
+			console.log(spb.gadgetType);
+		});
+	}, 
+
 	openSerialPort: function(serialPortNameList){
+		
 		serialPortNameList.forEach(function(portName) {
 			var spb = new SerialPortBean(portName, DEFAULT_SERIAL_OPTION);
 			spb.connect();
+			efb.serialPortList[efb.serialPortList.length] = spb;
 		});
-	}, 
+
+		setTimeout(efb.checkGadget, 3000);
+	},
+
+
 };
 
 
