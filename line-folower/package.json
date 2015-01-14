@@ -1,0 +1,9 @@
+{
+  "name": "line-follower",
+  "version": "0.0.1",
+  "description": "line follower",
+  "author": "HE Qichen",
+  "dependencies": {
+  	"http-server" :	"0.7.x",
+  }
+}
