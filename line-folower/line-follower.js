@@ -1,5 +1,5 @@
 var LF = function(){
-	//efb.writeBinary("L", "A", 1);
-	efb.readValue("L", "B", console.log);
+	efb.writeValue("M", "A", 128);
+	//efb.readValue("L", "B", console.log);
 };
 

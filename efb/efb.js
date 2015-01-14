@@ -204,7 +204,7 @@ var server = http.createServer(function(req, resp) {
 		resp.end();
 
 	} else {
-		if (pathname === "/write_binary") {
+		if (pathname === "/write_value") {
 			var channel = urlObj.query.channel;
 			var value = Number(urlObj.query.value);
 			var gadgetTag = urlObj.query.tag;

@@ -1,9 +1,9 @@
 var efb = {
 	host: "http://127.0.0.1:8080", 
 
-	writeBinary: function(tag, channel, value) {
+	writeValue: function(tag, channel, value) {
 		$.ajax({
-			url: efb.host + "/write_binary",
+			url: efb.host + "/write_value",
 			data: {
 				"tag": tag, 
 				"channel": channel, 
