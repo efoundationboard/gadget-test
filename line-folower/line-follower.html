@@ -12,7 +12,7 @@
 <script>
 	$(document).ready(function() {
 		var lf = new LF();
-
+		lf.stopMotor = true;
 		setInterval(function(){
 			lf.getSensorValue(function(data){
 				$("#left-value").text(data[0]);

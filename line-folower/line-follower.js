@@ -5,8 +5,10 @@ var LF = function(){
 	this._leftSensorTag = "L";
 	this._rightSensorTag = "R";
 	this._motorTag = "M";
-	this.leftSpeed = 0;
-	this.rightSpeed = 0;
+	this._leftSpeed = 0;
+	this._rightSpeed = 0;
+
+	this.stopMotor = false;
 
 	efb.writeValue(self._leftSensorTag, "A", 1);
 	efb.writeValue(self._rightSensorTag, "A", 1);
@@ -23,6 +25,11 @@ var LF = function(){
 			self._rightSpeed = -80;
 		} else {
 			self._rightSpeed = 127;
+		}
+
+		if (self.stopMotor) {
+			self._leftSpeed = 0;
+			self._rightSpeed = 0;
 		}
 
 		//update sensor;
