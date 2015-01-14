@@ -83,6 +83,22 @@ var Gadget = function(sp, gadgetType, callback) {
 					callback("gadget has no channel " + channel);
 				}
 				break;
+			case GADGET_TYPE_DUAL_MOTOR:
+				var buf = new Buffer(2);
+				buf[1] = Number(value);
+				var valueStr = String.fromCharCode(value);
+				if (channel === "A") {
+					buf[0] = 'L'.charCodeAt(0);
+					self._sp.write(buf, function(err, result) {callback("ok");});
+				} else {
+					if (channel === "B") {
+						buf[0] = 'R'.charCodeAt(0);
+						self._sp.write(buf, function(err, result) {callback("ok");});
+					} else {
+						callback("gadget has not channel " + channel);
+					}
+				}
+				break;
 			default:
 				callback("gadget not support");
 				break;
@@ -187,13 +203,13 @@ var server = http.createServer(function(req, resp) {
 	} else {
 		if (pathname === "/write_binary") {
 			var channel = urlObj.query.channel;
-			var value = urlObj.query.value;
+			var value = Number(urlObj.query.value);
 			var gadgetTag = urlObj.query.tag;
 
 			var g = gadgetList[gadgetTag];
 			var respObj = {
 				tag: urlObj.query.tag, 
-				value	: urlObj.query.value, 
+				value	: Number(urlObj.query.value), 
 				channel: urlObj.query.channel, 
 				message: undefined, 
 			};
