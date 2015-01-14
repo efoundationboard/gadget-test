@@ -61,6 +61,8 @@ void readSerial()
 
 void writeSpeed(bool isLeft, unsigned char rawSpeed)
 {
+	Serial.print("rawSpeed is : ");
+	Serial.println(int(rawSpeed));
 	int pinA, pinB;
 	if (isLeft)
 	{
@@ -78,7 +80,7 @@ void writeSpeed(bool isLeft, unsigned char rawSpeed)
 	if (rawSpeed > 128)
 	{
 		speed = map(rawSpeed, 129, 255, 1, 255);
-		constrain(speed, 0, 128);
+		constrain(speed, 0, 255);
 		
 		digitalWrite(pinB, LOW);
 		analogWrite(pinA, speed);
@@ -88,7 +90,7 @@ void writeSpeed(bool isLeft, unsigned char rawSpeed)
 		if (rawSpeed < 128)
 		{
 			speed = map(rawSpeed, 0, 127, 255, 1);
-			constrain(speed, 0, 128);
+			constrain(speed, 0, 255);
 			digitalWrite(pinA, LOW);
 			analogWrite(pinB, speed);
 		}
