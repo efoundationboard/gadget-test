@@ -185,7 +185,10 @@ var server = http.createServer(function(req, resp) {
 	var urlObj = url.parse(req.url, true);
 	var pathname = urlObj.pathname;
 
-	resp.writeHead(200, { 'Content-Type': 'application/json' });
+	resp.writeHead(200, { 
+		'Content-Type': 'application/json',
+		"Access-Control-Allow-Origin" : "*", 
+	});
 	if (pathname === "/list_all_gadgets") {
 		var respList = [];
 		gadgetList.forEach(function(gadget) {
