@@ -12,6 +12,7 @@
 		left speed: <span id="left-speed">undefined</span> right speed: <span id="right-speed">undefined</span><br />
 		left light: <input type="button" id="btn-left-light" onclick="javascript:return false;" value="turn OFF"/> 
 		right light: <input type="button" id="btn-right-light" onclick="javascript:return false;" value="turn OFF" /><br />
+		Motor control: <input type="button" id="btn-motor" onclick="javascript:return false;" value="turn ON" /><br />
 <script>
 	$(document).ready(function() {
 		var lf = new LF();
@@ -55,6 +56,16 @@
 				lf.setRightLight(true);
 				$("#btn-right-light").val("turn OFF");
 				lf.flushLightStatus();
+			}
+		});
+
+		$("#btn-motor").on("click", function() {
+			if (lf.getMotorSwitch()) {
+				lf.setMotorSwitch(false);
+				$("#btn-motor").val("turn ON");
+			} else {
+				lf.setMotorSwitch(true);
+				$("#btn-motor").val("turn OFF");
 			}
 		});
 

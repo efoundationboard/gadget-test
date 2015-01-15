@@ -10,7 +10,7 @@ var LF = function(){
 	this._leftLight = true;
 	this._rightLight = true;
 
-	this.stopMotor = false;
+	this._stopMotor = true;
 
 	efb.writeValue(self._leftSensorTag, "A", self._leftLight?1:0);
 	efb.writeValue(self._rightSensorTag, "A", self._rightLight?1:0);
@@ -29,7 +29,7 @@ var LF = function(){
 			self._rightSpeed = 127;
 		}
 
-		if (self.stopMotor) {
+		if (self._stopMotor) {
 			self._leftSpeed = 0;
 			self._rightSpeed = 0;
 		}
@@ -73,6 +73,14 @@ var LF = function(){
 		efb.writeValue(self._leftSensorTag, "A", self._leftLight?1:0);
 		efb.writeValue(self._rightSensorTag, "A", self._rightLight?1:0);
 	};
+
+	this.setMotorSwitch = function(value) {
+		self._stopMotor = value;
+	}
+
+	this.getMotorSwitch = function() {
+		return self._stopMotor;
+	}
 
 	setInterval(self._loop, 100);
 };
