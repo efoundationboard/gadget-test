@@ -9,15 +9,14 @@
 	<body>
 		Host:<input type="text" id="host" /> <input type="button" onclick="javascript:return false;" value="update host" id="btn-update-host" /><br />
 		Left: <span id="left-value">undefined</span> right: <span id="right-value">undefined</span><br />
-		left speed: <span id="left-speed">undefined</span> right speed: <span id="right-speed">undefined</span>
+		left speed: <span id="left-speed">undefined</span> right speed: <span id="right-speed">undefined</span><br />
+		left light: <input type="button" id="btn-left-light" onclick="javascript:return false;" value="turn OFF"/> 
+		right light: <input type="button" id="btn-right-light" onclick="javascript:return false;" value="turn OFF" /><br />
 <script>
 	$(document).ready(function() {
 		var lf = new LF();
 		lf.stopMotor = true;
-		$("#host").val(efb.getHost());
-		$("#btn-update-host").on("click", function(){
-			efb.setHost($("#host").val());
-		});
+		
 		setInterval(function(){
 			lf.getSensorValue(function(data){
 				$("#left-value").text(data[0]);
@@ -28,6 +27,37 @@
 				$("#right-speed").text(data[1]);
 			});
 		}, 100);
+
+		$("#host").val(efb.getHost());
+		$("#btn-update-host").on("click", function(){
+			efb.setHost($("#host").val());
+		});
+
+		$("#btn-left-light").on("click", function(){
+			
+			if (lf.getLeftLight()) {
+				lf.setLeftLight(false);
+				$("#btn-left-light").val("turn ON");
+				lf.flushLightStatus();
+			} else {
+				lf.setLeftLight(true);
+				$("#btn-left-light").val("turn OFF");
+				lf.flushLightStatus();
+			}
+		});
+		$("#btn-right-light").on("click", function(){
+			
+			if (lf.getRightLight()) {
+				lf.setRightLight(false);
+				$("#btn-right-light").val("turn ON");
+				lf.flushLightStatus();
+			} else {
+				lf.setRightLight(true);
+				$("#btn-right-light").val("turn OFF");
+				lf.flushLightStatus();
+			}
+		});
+
 	});
 	
 </script>

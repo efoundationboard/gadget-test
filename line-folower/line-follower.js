@@ -7,11 +7,13 @@ var LF = function(){
 	this._motorTag = "M";
 	this._leftSpeed = 0;
 	this._rightSpeed = 0;
+	this._leftLight = true;
+	this._rightLight = true;
 
 	this.stopMotor = false;
 
-	efb.writeValue(self._leftSensorTag, "A", 1);
-	efb.writeValue(self._rightSensorTag, "A", 1);
+	efb.writeValue(self._leftSensorTag, "A", self._leftLight?1:0);
+	efb.writeValue(self._rightSensorTag, "A", self._rightLight?1:0);
 
 	this._loop = function() {
 		//console.log(self._leftSensor + " | " + self._rightSensor);
@@ -41,15 +43,36 @@ var LF = function(){
 		efb.readValue(self._leftSensorTag, "B", function(value){self._leftSensor = value;});
 		efb.readValue(self._rightSensorTag, "B", function(value){self._rightSensor = value;});
 
-	}
+	};
 
 	this.getSensorValue = function(callback) {
 		callback([self._leftSensor, self._rightSensor]);
-	}
+	};
 
 	this.getSpeed = function(callback) {
 		callback([self._leftSpeed, self._rightSpeed]);
-	}
+	};
+
+	this.setLeftLight = function(value) {
+		self._leftLight = value;
+	};
+
+	this.setRightLight = function(value) {
+		self._rightLight = value;
+	};
+
+	this.getLeftLight = function() {
+		return self._leftLight;
+	};
+
+	this.getRightLight = function() {
+		return self._rightLight;
+	};
+
+	this.flushLightStatus = function() {
+		efb.writeValue(self._leftSensorTag, "A", self._leftLight?1:0);
+		efb.writeValue(self._rightSensorTag, "A", self._rightLight?1:0);
+	};
 
 	setInterval(self._loop, 100);
 };
