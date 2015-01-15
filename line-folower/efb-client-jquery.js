@@ -1,9 +1,17 @@
 var efb = {
-	host: "http://127.0.0.1:8080", 
+	host: "127.0.0.1:8080", 
+
+	getHost: function() {
+		return efb.host;
+	},
+
+	setHost: function(newHost) {
+		efb.host = newHost;
+	} , 
 
 	writeValue: function(tag, channel, value) {
 		$.ajax({
-			url: efb.host + "/write_value",
+			url: "http://" + efb.host + "/write_value",
 			data: {
 				"tag": tag, 
 				"channel": channel, 
@@ -24,7 +32,7 @@ var efb = {
 
 	readValue: function(tag, channel, callback) {
 		$.ajax({
-			url: efb.host + "/read_value",
+			url: "http://" + efb.host + "/read_value",
 			data: {
 				"tag": tag, 
 				"channel": channel, 

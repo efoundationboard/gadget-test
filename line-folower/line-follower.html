@@ -7,12 +7,17 @@
 		<script src="line-follower.js"  type="text/javascript"></script>
 	</head>
 	<body>
+		Host:<input type="text" id="host" /> <input type="button" onclick="javascript:return false;" value="update host" id="btn-update-host" /><br />
 		Left: <span id="left-value">undefined</span> right: <span id="right-value">undefined</span><br />
 		left speed: <span id="left-speed">undefined</span> right speed: <span id="right-speed">undefined</span>
 <script>
 	$(document).ready(function() {
 		var lf = new LF();
 		lf.stopMotor = true;
+		$("#host").val(efb.getHost());
+		$("#btn-update-host").on("click", function(){
+			efb.setHost($("#host").val());
+		});
 		setInterval(function(){
 			lf.getSensorValue(function(data){
 				$("#left-value").text(data[0]);
