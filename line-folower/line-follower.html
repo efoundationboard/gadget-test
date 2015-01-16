@@ -14,7 +14,20 @@
 		right light: <input type="button" id="btn-right-light" onclick="javascript:return false;" value="turn OFF" /><br />
 		Motor control: <input type="button" id="btn-motor" onclick="javascript:return false;" value="turn ON" /><br />
 <script>
+	var updateDefaultHost = function () {
+		$.ajax({
+			url: "./config.json",
+			dataType: "json", 
+			success: function(data){
+					$("#host").val(data.defaultHost);
+				}, 
+
+		});
+	};
+
 	$(document).ready(function() {
+
+		updateDefaultHost();
 		var lf = new LF();
 		lf.stopMotor = true;
 		
